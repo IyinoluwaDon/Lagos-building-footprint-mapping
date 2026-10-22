@@ -1,0 +1,10 @@
+[theme]
+base = "light"
+primaryColor = "#087f68"
+backgroundColor = "#ffffff"
+secondaryBackgroundColor = "#f2f7f5"
+textColor = "#18332d"
+font = "sans-serif"
+chartCategoricalColors = ["#087f68", "#275a9e", "#d18b27", "#773a91", "#bd4c45"]
+baseRadius = "medium"
+showWidgetBorder = true

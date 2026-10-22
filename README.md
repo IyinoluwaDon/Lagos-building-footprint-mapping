@@ -34,6 +34,23 @@ Use the data dictionary for field definitions and the project overview for the r
 - [`results/lagos/DATA_DICTIONARY.md`](results/lagos/DATA_DICTIONARY.md)
 - [`docs/ASSESSMENT.md`](docs/ASSESSMENT.md)
 
+## Interactive dashboard
+
+The Streamlit app provides a plain-language overview, an interactive map, confidence filtering, attribute inspection, filtered GeoJSON/CSV downloads, and a technical QA panel. It starts with the supplied Ikeja export and can load a different Lagos export plus its matching summary CSV.
+
+```powershell
+python -m venv .venv
+.venv\Scripts\Activate.ps1
+python -m pip install -r requirements-app.txt
+streamlit run app.py
+```
+
+Open the local address printed by Streamlit (usually `http://localhost:8501`). On first launch it reads the included 21 MB GeoJSON and summary CSV. Use **Use another export** in the sidebar to select a replacement pair; an optional matching boundary GeoJSON can be overlaid and used for exact containment checks. The interactive slider filters features already included in the selected export; it cannot retrieve predictions below the source export's original confidence cutoff.
+
+Filtered GeoJSON and attribute CSV files are created when you press their download buttons and saved by your browser to its configured Downloads folder. To keep a local copy with source hashes and run metadata, choose **Save filtered outputs into results/interactive** in the Explore view. Interactive exports are excluded from Git by default because they can duplicate the large source GeoJSON. Nothing is uploaded by this local app. Streamlit runs on your computer; the basemap and map-style assets are requested from CARTO when viewing the map, so internet access is needed for those tiles.
+
+The dashboard distinguishes model confidence from measured accuracy. It does not train a model, validate detections against local reference labels, or claim a complete building census. See [`docs/METHOD_AND_REPRODUCIBILITY.md`](docs/METHOD_AND_REPRODUCIBILITY.md) for data provenance and methodological limits.
+
 ## Local analysis
 
 From the repository root:

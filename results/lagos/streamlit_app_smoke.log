@@ -1,0 +1,4 @@
+PASS: dashboard opened without app exceptions
+PASS: default Ikeja feature count = 53,437
+PASS: four audience views available
+Metrics: [('Predictions shown', '53,437'), ('Study area', '46.02 km²'), ('Median confidence', '0.858'), ('Median clipped area', '124.1 m²')]

@@ -7,6 +7,6 @@ test_open_ring_is_invalid (test_analysis_helpers.GeometryRingTests.test_open_rin
 test_out_of_range_coordinate_is_invalid (test_analysis_helpers.GeometryRingTests.test_out_of_range_coordinate_is_invalid) ... ok
 
 ----------------------------------------------------------------------
-Ran 7 tests in 0.001s
+Ran 7 tests in 0.004s
 
 OK

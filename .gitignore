@@ -4,6 +4,7 @@ __pycache__/
 *.py[cod]
 .ipynb_checkpoints/
 .analysis_deps/
+results/interactive/
 
 # Temporary presentation authoring and chart data
 .build/
