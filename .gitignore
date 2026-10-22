@@ -1,0 +1,11 @@
+# Local Colab/Python/editor state
+.venv/
+__pycache__/
+*.py[cod]
+.ipynb_checkpoints/
+
+# Downloaded or generated data and model artifacts
+data/
+outputs/
+*.pt
+*.pth
