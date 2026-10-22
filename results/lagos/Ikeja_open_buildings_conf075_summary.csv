@@ -1,0 +1,2 @@
+system:index,boundary_area_km2,boundary_name,boundary_source,export_started_utc,filtered_footprint_count,footprint_dataset,minimum_confidence,source_inference_year,source_license,.geo
+0,46.01563487054558,Ikeja,FAO GAUL 2025 level 2,2026-10-22T14:39:28.195688+00:00,53437,Google Research Open Buildings V3,0.75,2023,CC BY 4.0,"{""type"":""MultiPoint"",""coordinates"":[]}"

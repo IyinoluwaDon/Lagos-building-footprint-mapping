@@ -1,10 +1,7 @@
-# Lagos presentation deliverables
+# Complete project presentation
 
-Run `notebooks/lagos_open_buildings_gee.ipynb` to export these files to `My Drive/Lagos_Open_Buildings/`:
+[Project_2_Lagos_Building_Footprint_Mapping.pptx](Project_2_Lagos_Building_Footprint_Mapping.pptx) presents the work as a full geospatial project: research question, scope, data, study boundary, processing workflow, Ikeja analysis, QA, interpretation, reproducibility, project review, and next steps. It includes speaker notes with source links and methodological caveats.
 
-- `<LGA>_open_buildings_conf075.geojson` — clipped footprint features;
-- `<LGA>_open_buildings_conf075_summary.csv` — boundary area, confidence cutoff, footprint count, source year, and export time.
+Generated figures use the supplied GeoJSON and summary CSV. The matching GAUL boundary file is missing from those supplied inputs, so the map is labeled as a feature extent and exact boundary containment remains unverified. Model confidence is not local accuracy. The deck includes an editable confidence chart with embedded data.
 
-After both Earth Engine tasks finish, download the files from Drive. Keep source exports in `results/lagos/`; use the GeoJSON to create a map in QGIS and use the summary CSV for the presentation numbers. Follow [`SLIDE_OUTLINE.md`](SLIDE_OUTLINE.md) to structure the slides.
-
-The export has not been run yet, so there are no measured Lagos results or final map in this folder. The feature count describes the filtered source dataset; it is not an independent accuracy measurement.
+Rebuild the figures with `python results/lagos/analyze_export.py`. See `SLIDE_OUTLINE.md` for the presentation narrative and `docs/ASSESSMENT.md` for the project rating rubric.

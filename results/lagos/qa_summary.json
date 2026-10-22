@@ -1,0 +1,97 @@
+{
+  "analysis_timestamp_utc": "2026-10-22T15:30:15.713338+00:00",
+  "analysis_environment": {
+    "python": "3.12.14",
+    "pillow": "12.3.0",
+    "shapely": "2.2.0"
+  },
+  "inputs": {
+    "geojson": {
+      "path": "Ikeja_open_buildings_conf075.geojson",
+      "bytes": 21246347,
+      "sha256": "8832c6035c7ce73cbd7cea8733d52138e85199a6a46a96bbfd96e33070d1f8e1"
+    },
+    "summary_csv": {
+      "path": "Ikeja_open_buildings_conf075_summary.csv",
+      "bytes": 372,
+      "sha256": "4e7fca6c3e180a0424737e3b22cb0bac68cf422d477d5c1e8b41a89c8f359a46"
+    }
+  },
+  "source_metadata": {
+    "system:index": "0",
+    "boundary_area_km2": "46.01563487054558",
+    "boundary_name": "Ikeja",
+    "boundary_source": "FAO GAUL 2025 level 2",
+    "export_started_utc": "2026-10-22T14:39:28.195688+00:00",
+    "filtered_footprint_count": "53437",
+    "footprint_dataset": "Google Research Open Buildings V3",
+    "minimum_confidence": "0.75",
+    "source_inference_year": "2023",
+    "source_license": "CC BY 4.0",
+    ".geo": "{\"type\":\"MultiPoint\",\"coordinates\":[]}"
+  },
+  "feature_count": 53437,
+  "feature_count_density_per_km2": 1161.2792076069954,
+  "feature_density_note": "Descriptive prediction count per exported boundary area; not population density or completeness.",
+  "geometry_types": {
+    "Polygon": 53434,
+    "MultiPolygon": 3
+  },
+  "coordinate_extent_lonlat": [
+    3.316301680283738,
+    3.383109858881154,
+    6.551081490874717,
+    6.657095659557122
+  ],
+  "confidence": {
+    "minimum": 0.75,
+    "maximum": 0.9746999740600586,
+    "mean": 0.853575487037747,
+    "median": 0.8575000166893005,
+    "threshold": 0.75,
+    "bins": {
+      "0.75–0.80": 12628,
+      "0.80–0.85": 12142,
+      "0.85–0.90": 13945,
+      "0.90–0.95": 14057,
+      "0.95–1.00": 665
+    },
+    "bin_percentages": {
+      "0.75–0.80": 23.63,
+      "0.80–0.85": 22.72,
+      "0.85–0.90": 26.1,
+      "0.90–0.95": 26.31,
+      "0.95–1.00": 1.24
+    }
+  },
+  "clipped_area_m2": {
+    "sum_non_dissolved_features": 11853796.726504242,
+    "median": 124.12234810546397,
+    "p90": 399.73965409861967,
+    "maximum": 19393.963602176085,
+    "summed_feature_area_over_boundary_area_percent": 25.76036766601651,
+    "note": "Summed feature areas are not a dissolved coverage measure; overlaps are not removed."
+  },
+  "quality_checks": {
+    "geojson_feature_count_matches_summary_csv": true,
+    "all_confidence_values_meet_minimum": true,
+    "confidence_scores_within_unit_interval": true,
+    "all_clipped_areas_are_positive": true,
+    "unique_feature_ids": true,
+    "polygon_rings_closed_and_coordinates_wgs84": true,
+    "feature_geometries_present": true,
+    "polygon_topology_valid": true,
+    "inside_matching_boundary": "NOT RUN — matching GAUL 2025 boundary GeoJSON was not supplied"
+  },
+  "geometry_structure": {
+    "closed_rings": 53462,
+    "open_or_invalid_rings": 0,
+    "empty_geometries": 0,
+    "missing_confidence": 0,
+    "missing_clipped_area": 0,
+    "missing_feature_ids": 0,
+    "invalid_topology": 0,
+    "outside_boundary_features": null
+  },
+  "independent_boundary_validation": "Not possible from the supplied files; rerun the updated notebook and add its matching boundary GeoJSON."
+}

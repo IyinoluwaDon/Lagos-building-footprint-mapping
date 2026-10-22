@@ -3,9 +3,8 @@
 __pycache__/
 *.py[cod]
 .ipynb_checkpoints/
+.analysis_deps/
 
-# Downloaded or generated data and model artifacts
-data/
-outputs/
-*.pt
-*.pth
+# Temporary presentation authoring and chart data
+.build/
+.chart-data-*/
