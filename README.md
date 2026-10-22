@@ -1,4 +1,4 @@
-# Project 2: Lagos building footprint mapping
+# Lagos building footprint mapping
 
 A cloud-first geospatial workflow to export, audit, explain, and present existing building-footprint predictions for a selected Lagos LGA. Google Earth Engine processes the Open Buildings layer on the server; the notebook previews map tiles and exports clipped vectors without downloading a large imagery archive.
 
