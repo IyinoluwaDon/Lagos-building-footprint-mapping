@@ -8,6 +8,8 @@ This project reuses Google Research Open Buildings V3. It does **not** train a m
 
 What footprints does Open Buildings V3 predict inside a selected Lagos LGA at a chosen confidence cutoff, and which properties of the export can be checked reproducibly?
 
+For the complete project rationale, methods, current results, caveats, tools, and a chatbot-ready reporting prompt, see [`docs/PROJECT_MASTER_SUMMARY.md`](docs/PROJECT_MASTER_SUMMARY.md).
+
 ## Quick start
 
 1. Open [`notebooks/lagos_open_buildings_gee.ipynb`](notebooks/lagos_open_buildings_gee.ipynb) in Colab. Upload the notebook; you do not need to upload this whole repository to Drive.
