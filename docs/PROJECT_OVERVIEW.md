@@ -1,57 +1,55 @@
-# Project 2: Lagos Building Footprint Mapping
+# Lagos Building Footprint Mapping with U-Net
 
 ## Project overview
 
-This project produces a traceable building-footprint layer for one Lagos Local Government Area (LGA) at a time. It uses the existing Google Research Open Buildings V3 predictions in Google Earth Engine, clips them to the selected FAO GAUL 2025 level 2 boundary, and prepares a local audit and presentation package.
+This project combines a SpaceNet-based building-segmentation training pipeline with a Lagos-specific footprint export and audit workflow. The custom U-Net is designed to train from SpaceNet 2 AOI 2 Vegas RGB-PanSharpen imagery and polygon labels. Its inference workflow accepts compatible georeferenced Lagos imagery and clips predictions to a supplied Lagos boundary. Google Research Open Buildings V3 predictions remain a separately sourced Lagos baseline. The repository currently contains the training and inference code; no U-Net checkpoint or Lagos U-Net prediction has been generated yet.
 
 ## Research question
 
-**What building footprints does Open Buildings V3 predict within a selected Lagos LGA at a chosen confidence cutoff, and what can be verified about the resulting export?**
+**How well does a U-Net trained on SpaceNet building polygons segment buildings in held-out SpaceNet images, and how does that model transfer to compatible high-resolution imagery inside Lagos?**
 
-For the supplied Ikeja export, the cutoff is 0.75 and the dataset contains 53,437 predictions. These figures describe the supplied model output. They do not estimate local completeness or building-level accuracy.
+The training workflow reports image-held-out IoU and F1. Lagos transfer predictions are written as a georeferenced probability raster and boundary-clipped GeoJSON polygons.
 
 ## Objectives
 
-1. Select a Lagos LGA from the boundary layer rather than hard-code one study area.
-2. Explore a filtered footprint layer in a lightweight interactive preview.
-3. Export clipped footprints, the exact boundary, and one-row provenance metadata to Google Drive.
-4. Audit the exports locally for consistency, geometry integrity, confidence thresholds, and boundary containment when the boundary file is available.
-5. Produce reproducible tables, figures, logs, and presentation materials.
+1. Rasterize SpaceNet building polygons using each source image's CRS and transform.
+2. Split training and validation by source image, then create paired 256 × 256 image and mask tiles.
+3. Train a four-level U-Net using Dice plus focal loss and select the checkpoint by validation IoU.
+4. Apply the selected checkpoint to compatible high-resolution Lagos imagery.
+5. Clip probability rasters and vectorized footprints to a supplied Lagos boundary.
+6. Retain the Open Buildings V3 export and local audit as a Lagos-specific baseline product.
 
 ## Workflow
 
 ```mermaid
 flowchart LR
-    A[FAO GAUL 2025 level 2] --> C[Select Lagos LGA]
-    B[Open Buildings V3] --> D[Filter confidence]
-    C --> D
-    D --> E[Clip features in Earth Engine]
-    E --> F[GeoJSON, boundary GeoJSON, CSV to Drive]
-    F --> G[Local QA and checksums]
-    G --> H[Report, figures, presentation]
+    A[SpaceNet RGB imagery] --> C[Image and polygon pairing]
+    B[SpaceNet building GeoJSON] --> C
+    C --> D[Rasterized masks and 256 px chips]
+    D --> E[Image-level train and validation split]
+    E --> F[U-Net with Dice and focal loss]
+    F --> G[Validation IoU and F1]
+    F --> H[High-resolution Lagos RGB imagery]
+    I[Lagos boundary GeoJSON] --> J[Clipped probability map and polygons]
+    H --> J
+    F --> J
 ```
 
-## Supplied Ikeja result
+## Supplied Ikeja Open Buildings result
 
-- Reported boundary area: 46.016 km².
-- Filtered footprint predictions: 53,437 at confidence ≥ 0.75.
-- Median model confidence: 0.8575.
-- Median clipped feature area: 124.1 m²; 90th percentile: 399.7 m².
-- Geometry checks passed for the supplied GeoJSON, and its count matches the summary CSV.
-- Exact containment against the LGA boundary is pending because the matching boundary GeoJSON was not in the supplied export.
+The supplied Ikeja export contains 53,437 Google Research Open Buildings V3 predictions at a confidence cutoff of 0.75. These existing predictions are retained for comparison and are independent of the SpaceNet-trained U-Net.
 
-## Scope and interpretation
+## Model implementation
 
-This is a geospatial data processing and quality assurance project. It reuses an existing prediction layer; it does not train a neural network, create new imagery labels, or independently measure precision and recall. A confidence cutoff filters model outputs; it does not turn confidence into a calibrated probability of correctness. Feature count is not a building census. The sum of feature areas is not a coverage estimate because overlaps are not dissolved.
+The architecture, mask preparation, training loop, checkpointing, and Lagos inference are implemented in `src/lagos_buildings/`. Preparation records the SpaceNet source image IDs and RGB normalization values. When run, training records epoch-level metrics and saves the best validation-IoU checkpoint. Inference processes one georeferenced image tile at a time and uses the checkpoint's normalization values.
 
 ## Repository map
 
-- `notebooks/lagos_open_buildings_gee.ipynb` — Earth Engine and Colab export workflow.
-- `results/lagos/` — supplied source data, QA script, report, logs, data dictionary, and machine-readable metrics.
-- `results/presentation/` — editable slide deck and generated figures.
-- `tests/` — fast unit tests for confidence binning and geometry ring validation.
-- `README.md` — setup, run steps, and reproduction commands.
-
-## Current quality assessment
-
-The project is reproducible for the supplied export and the workflow supports other Lagos LGAs and confidence cutoffs. The highest-value remaining research upgrade is validation against an independent, locally curated reference dataset; until that exists, results should be described as model-derived predictions.
+- `src/lagos_buildings/model.py` — U-Net and Dice + focal loss.
+- `src/lagos_buildings/prepare.py` — image/label matching, mask rasterization, source-image split, and tiling.
+- `src/lagos_buildings/train.py` — model training, validation, and checkpoint selection.
+- `src/lagos_buildings/predict.py` — tiled prediction, boundary clipping, and polygon output.
+- `docs/MODEL_TRAINING.md` — model workflow and reproduction steps.
+- `notebooks/lagos_open_buildings_gee.ipynb` — Google Earth Engine export for the existing Open Buildings baseline.
+- `results/lagos/` — supplied Ikeja export and local QA artifacts.
+- `app.py` — interactive viewer for the supplied Open Buildings export.

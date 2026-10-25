@@ -5,22 +5,22 @@
 ## 1. Project identity
 
 - **Project title:** Project 2 — Lagos building footprint mapping
-- **Project type:** Cloud-first geospatial data export, quality assurance, and interactive exploration
+- **Project type:** Geospatial model development, Lagos transfer inference, source-data export, quality assurance, and interactive exploration
 - **Current study area:** Ikeja Local Government Area (LGA), Lagos State, Nigeria
 - **Intended scope:** Selectable Lagos LGAs; the supplied and locally audited export is Ikeja
-- **Data product:** Existing building-footprint predictions from Google Research Open Buildings V3 clipped to a selected Lagos LGA
-- **Model training:** None. The project does not train a U-Net or another model.
+- **Data products:** SpaceNet 2 AOI 2 Vegas building-segmentation model pipeline for Lagos transfer, plus existing Google Research Open Buildings V3 predictions clipped to a selected Lagos LGA
+- **Model status:** U-Net preparation, training, and inference code is implemented. SpaceNet data has not yet been prepared, training has not yet run, and no Lagos U-Net output is included.
 - **Current repository folder:** `building-footprints-unet` is a legacy name and does not accurately describe the current Lagos-only workflow. The clearer proposed name is `lagos-building-footprint-mapping`. The GitHub remote still points to `IyinoluwaDon/Building-footprints-unet` until its owner renames it.
 
 ## 2. Executive summary
 
-This project makes an existing building-footprint prediction layer easier to explore and audit for Lagos. A Google Colab notebook uses Google Earth Engine (GEE) to select an LGA from the FAO Global Administrative Unit Layers (GAUL) 2025 level 2 boundary data, filter Google Research Open Buildings V3 by a user-selected confidence cutoff, clip the results to the selected LGA, and export the footprint layer, matching study boundary, and provenance summary to Google Drive. A local Python audit then checks the exported data and produces reproducible reports and figures. A Streamlit application lets technical and nontechnical users explore the supplied Ikeja export, filter it, inspect attributes, and download or save subsets.
+This project now has two distinct building-mapping workflows. The model workflow prepares SpaceNet 2 AOI 2 Vegas imagery and building polygons, trains a four-level U-Net with Dice plus binary focal loss, evaluates held-out source images using IoU and F1, and applies a selected checkpoint to georeferenced high-resolution Lagos RGB imagery inside a supplied boundary. Training, validation, and inference code are implemented; SpaceNet training and Lagos inference have not yet been run. The companion Lagos baseline workflow uses Google Earth Engine (GEE) to select an LGA from FAO GAUL 2025 level 2, filter Google Research Open Buildings V3 by confidence, clip results, and export footprints, boundary, and provenance. A local Python audit checks that export, and a Streamlit application explores the supplied Ikeja baseline.
 
 The current supplied export contains **53,437 predicted footprints** for Ikeja at confidence **≥ 0.75**. The metadata reports a study area of **46.0156 km²**. Structural, score, identifier, coordinate, area, and topology checks passed. The matching boundary GeoJSON was absent from the supplied local files, so independent containment against that boundary has **not been verified**. No local reference labels or field survey were supplied, so the project cannot report precision, recall, completeness, or local building-detection accuracy.
 
 ## 3. Why the project exists
 
-Buildings are important features in urban mapping and planning. A reusable footprint layer can support exploratory mapping and downstream analysis, but a raw prediction layer is not automatically trustworthy, understandable, or ready to present. The project addresses a practical workflow problem: how to obtain a manageable Lagos LGA subset from a large cloud-hosted geospatial dataset, preserve its provenance, inspect the export, and explain what the results can and cannot support.
+Buildings are important features in urban mapping and planning. This project develops a trainable segmentation workflow for transferring a SpaceNet-trained model to Lagos and keeps a published prediction layer available as a separate local baseline. It also addresses how to obtain a manageable Lagos LGA subset from a cloud-hosted dataset, preserve its provenance, and inspect the export.
 
 The resource-conscious choice is to process the source collection in Earth Engine and export only the chosen area and confidence-filtered predictions. The workflow avoids downloading a 26 GB imagery archive for this use case. The current analysis reuses published predictions; it is not a new building-detection experiment.
 
@@ -28,26 +28,28 @@ The resource-conscious choice is to process the source collection in Earth Engin
 
 ### Research question
 
-**What building footprints does Open Buildings V3 predict within a selected Lagos LGA at a chosen confidence cutoff, and what can be verified about the resulting export?**
+**How does a U-Net trained on SpaceNet building labels perform on held-out source imagery, and how can its predictions be transferred to high-resolution imagery within Lagos? How do the resulting project outputs compare with the separate Open Buildings V3 Lagos baseline?**
 
 ### Aim
 
-Build a transparent and reproducible workflow to select, export, audit, explore, and present Open Buildings V3 footprint predictions for a Lagos LGA.
+Build a reproducible SpaceNet U-Net training and Lagos inference workflow, while retaining the Open Buildings V3 export, audit, and exploration workflow as a separate Lagos baseline.
 
 ### Objectives
 
-1. Select a Lagos LGA from an administrative boundary dataset rather than hard-code only one area.
-2. Choose a confidence cutoff and filter the source predictions in Earth Engine.
-3. Clip qualifying predictions to the selected LGA and export the footprints, exact boundary, and summary metadata.
-4. Check export counts, confidence values, feature identifiers, coordinate/ring structure, areas, and geometry validity locally.
-5. Make results understandable through documented metrics, figures, logs, a slide deck, and a technical/nontechnical dashboard.
-6. State evidence gaps clearly and avoid unsupported claims about accuracy or completeness.
+1. Pair SpaceNet AOI 2 Vegas RGB-PanSharpen imagery with building polygon labels and rasterize masks on each image grid.
+2. Split by source image and train the four-level U-Net with Dice plus binary focal loss.
+3. Select a checkpoint using validation IoU and report validation IoU and F1.
+4. Apply the trained checkpoint to compatible georeferenced high-resolution Lagos RGB imagery and clip outputs to a Lagos boundary.
+5. Retain the Open Buildings V3 LGA export, local QA, and Streamlit exploration as a separate baseline workflow.
 
 ## 5. What the project does and does not do
 
 ### It does
 
 - Reuse the published Google Research Open Buildings V3 prediction layer.
+- Prepare a SpaceNet 2 AOI 2 Vegas training set and rasterized building masks.
+- Train a U-Net and select a checkpoint using image-held-out validation IoU.
+- Apply a trained checkpoint to georeferenced Lagos RGB imagery and export clipped probability and footprint layers.
 - Support selection of a Lagos LGA and a configurable confidence threshold in the Earth Engine notebook.
 - Clip predictions to the selected study boundary in Earth Engine.
 - Export a GeoJSON footprint collection, matching boundary GeoJSON, and one-row CSV metadata to Google Drive.
@@ -56,7 +58,6 @@ Build a transparent and reproducible workflow to select, export, audit, explore,
 
 ### It does not
 
-- Train, fine-tune, or evaluate a U-Net or another detection model.
 - Create new imagery annotations or independent ground truth.
 - Validate predictions using field surveys or a locally curated reference dataset.
 - Establish precision, recall, completeness, omission/commission error, or local accuracy.
@@ -80,7 +81,7 @@ Build a transparent and reproducible workflow to select, export, audit, explore,
 
 For reuse, credit Google Research Open Buildings V3 and FAO GAUL 2025 under CC BY 4.0. See the [Open Buildings V3 Earth Engine catalog page](https://developers.google.com/earth-engine/datasets/catalog/GOOGLE_Research_open-buildings_v3_polygons) and [FAO GAUL 2025 level 2 catalog page](https://developers.google.com/earth-engine/datasets/catalog/FAO_GAUL_2025_level2) for source descriptions and terms.
 
-The Earth Engine notebook requires the user's Earth Engine-enabled Google Cloud Project ID and Google account authentication in Colab. Do not put credentials, tokens, or keys in this repository. The notebook exports to the authenticated user's Google Drive; the local Streamlit application does not upload the data it reads.
+The Earth Engine notebook requires the user's Earth Engine-enabled Google Cloud Project ID and Google account authentication in Colab. Do not put credentials, tokens, or keys in this repository. The notebook exports to the authenticated user's Google Drive; the local Streamlit application does not upload the data it reads. The SpaceNet U-Net workflow is implemented locally in `src/lagos_buildings/`; the training run and Lagos inference outputs remain to be generated.
 
 ## 7. Workflow: end to end
 
@@ -94,6 +95,11 @@ flowchart LR
   F --> G[Local reproducible QA]
   G --> H[Metrics, figures, logs, and slide deck]
   F --> I[Streamlit exploration and filtered exports]
+  J[SpaceNet RGB imagery and building GeoJSON] --> K[Mask preparation and image-level split]
+  K --> L[U-Net training with Dice plus focal loss]
+  L --> M[Held-out IoU and F1]
+  L --> N[High-resolution Lagos imagery and boundary]
+  N --> O[Clipped probability raster and footprint polygons]
 ```
 
 ### Cloud export steps

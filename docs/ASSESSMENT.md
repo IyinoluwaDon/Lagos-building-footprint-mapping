@@ -1,6 +1,10 @@
 # Independent project review
 
-## Rating after the current upgrades: 7/10 as a reproducible project demonstration
+This assessment describes the Open Buildings V3 export and QA deliverable. A SpaceNet U-Net training and inference pipeline has since been added in `src/lagos_buildings/`. Running the training command generates model metrics; no U-Net checkpoint or Lagos predictions are currently included. The model workflow is separate from the supplied Ikeja export results below.
+
+## Rating for the supplied Open Buildings V3 export and QA deliverable: 7/10
+
+This rating is scoped to the export and QA deliverable. It does not assess the newly added U-Net pipeline, which has not yet been trained or evaluated.
 
 | Dimension | Score | Reason |
 |---|---:|---|
