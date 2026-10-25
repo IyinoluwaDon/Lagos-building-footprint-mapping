@@ -123,3 +123,4 @@ python -m pytest -q
 - `app.py` — Open Buildings explorer with separate U-Net validation and test results.
 - `docs/MODEL_TRAINING.md` — model workflow details and data preparation notes.
 - `docs/METHOD_AND_REPRODUCIBILITY.md` — export, model, and local audit reproduction.
+- `docs/TECHNICAL_NOTES.md` — U-Net, raster/vector processing, the separate footprint sources, and evaluation terminology.
