@@ -1,12 +1,14 @@
 # Method and reproducibility
 
-This document covers both the SpaceNet U-Net training/inference pipeline and the Lagos Open Buildings V3 export/QA workflow. See `MODEL_TRAINING.md` for the model design, loss, split, and inference details. The pipeline code is present; SpaceNet training and Lagos U-Net inference have not yet been run.
+This document covers the SpaceNet U-Net training/test/inference pipeline and the Lagos Open Buildings V3 export/QA workflow. See `MODEL_TRAINING.md` for model design, loss, data subset, split, and results. The compact model was trained and tested locally; Lagos U-Net inference has not been run because a compatible high-resolution Lagos image is not in the project files.
 
 ## U-Net training
 
 The training source is SpaceNet 2 AOI 2 Vegas RGB-PanSharpen imagery paired by image ID with building GeoJSON. `src/lagos_buildings/prepare.py` reprojects each polygon collection to its image CRS, rasterizes masks against the image transform, splits by source image, and emits aligned chips. Training imagery supplies per-band 2nd and 98th percentile normalization values, which are recorded in the manifest and checkpoint for Lagos inference.
 
-`src/lagos_buildings/model.py` defines a four-level U-Net with RGB input and a one-channel building-logit head. `src/lagos_buildings/train.py` optimizes Dice plus binary focal loss with Adam. When run, it reports pixel IoU and F1 on held-out source images, saves the checkpoint with the highest validation IoU, and writes epoch metrics to a JSON sidecar.
+`src/lagos_buildings/model.py` defines a four-level U-Net with RGB input and a one-channel building-logit head. `src/lagos_buildings/train.py` optimizes Dice plus binary focal loss with Adam. The seeded 48-scene subset produced 377 chips, trained for five CPU epochs (base width 8), and selected a checkpoint using image-held-out validation IoU. Validation IoU/F1 were 0.516/0.680 at threshold 0.5. The saved checkpoint and epoch history are `outputs/unet_spacenet2_vegas.pt` and `outputs/unet_spacenet2_vegas.metrics.json`.
+
+The final test sample is separate: 12 scene pairs were downloaded after excluding every training/validation ID, and 10 unseen source scenes (90 chips) were evaluated by `src/lagos_buildings/evaluate.py`. The script checks disjoint scene IDs before evaluation. Test pixel IoU/F1 were 0.597/0.748 at threshold 0.5; results are saved to `outputs/unet_spacenet2_vegas.test_metrics.json`. These are in-domain SpaceNet Vegas metrics, not Lagos transfer metrics.
 
 ## Lagos U-Net inference
 

@@ -1,0 +1,27 @@
+{
+  "test_source": "SpaceNet 2 AOI 2 Vegas RGB-PanSharpen images and building GeoJSON labels",
+  "evaluation_split": "unseen SpaceNet source images, excluded from training and checkpoint selection",
+  "test_scene_ids": [
+    "291",
+    "691",
+    "1038",
+    "2622",
+    "3205",
+    "3269",
+    "4703",
+    "4864",
+    "4876",
+    "5319"
+  ],
+  "test_source_images": 10,
+  "test_tiles": 90,
+  "architecture": "U-Net",
+  "base_channels": 8,
+  "threshold": 0.5,
+  "test_loss": 0.7258564021852282,
+  "test_pixel_iou": 0.5971380490127027,
+  "test_pixel_f1": 0.7477600942283399,
+  "device": "cpu",
+  "checkpoint": "outputs\\unet_spacenet2_vegas.pt",
+  "checkpoint_sha256": "f1e89a9242723a84c2e5e272ac9f020f5a9ae140e35934eeb1df47a547a44eb6"
+}

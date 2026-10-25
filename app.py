@@ -22,6 +22,9 @@ ROOT = Path(__file__).resolve().parent
 DEFAULT_GEOJSON = ROOT / "results" / "lagos" / "Ikeja_open_buildings_conf075.geojson"
 DEFAULT_SUMMARY = ROOT / "results" / "lagos" / "Ikeja_open_buildings_conf075_summary.csv"
 QA_SUMMARY = ROOT / "results" / "lagos" / "qa_summary.json"
+MODEL_METRICS = ROOT / "outputs" / "unet_spacenet2_vegas.metrics.json"
+MODEL_TEST_METRICS = ROOT / "outputs" / "unet_spacenet2_vegas.test_metrics.json"
+MODEL_TEST_PREVIEW = ROOT / "outputs" / "model_test_scene291_preview.png"
 
 st.set_page_config(
     page_title="Lagos Building Footprints",
@@ -33,8 +36,8 @@ st.set_page_config(
 
 def _walk_coordinates(coordinates: Any) -> Iterator[tuple[float, float]]:
     """Yield valid longitude/latitude pairs from nested GeoJSON coordinates."""
-    if isinstance(coordinates, (list, tuple)) and len(coordinates) >= 2:
-        if all(isinstance(value, (int, float)) and math.isfinite(value) for value in coordinates[:2]):
+    if isinstance(coordinates, (list, tuple)):
+        if len(coordinates) >= 2 and all(isinstance(value, (int, float)) and math.isfinite(value) for value in coordinates[:2]):
             yield float(coordinates[0]), float(coordinates[1])
             return
         for child in coordinates:
@@ -329,6 +332,64 @@ def main() -> None:
                     "Dataset license": summary.get("source_license", "Not stated"),
                 })
 
+            st.markdown("### Project-trained SpaceNet U-Net")
+            try:
+                model_metrics = json.loads(MODEL_METRICS.read_text(encoding="utf-8"))
+            except (OSError, json.JSONDecodeError):
+                model_metrics = None
+            if model_metrics:
+                try:
+                    test_metrics = json.loads(MODEL_TEST_METRICS.read_text(encoding="utf-8"))
+                except (OSError, json.JSONDecodeError):
+                    test_metrics = None
+                with st.container(horizontal=True):
+                    st.metric("Validation IoU", f"{model_metrics['best_validation_iou']:.3f}", border=True)
+                    st.metric("Validation F1", f"{model_metrics['best_validation_f1']:.3f}", border=True)
+                    st.metric("Test IoU", f"{test_metrics['test_pixel_iou']:.3f}" if test_metrics else "Not run", border=True)
+                    st.metric("Test F1", f"{test_metrics['test_pixel_f1']:.3f}" if test_metrics else "Not run", border=True)
+                st.caption(
+                    f"Four-level U-Net trained on {model_metrics['training_source']} · "
+                    f"{model_metrics['epochs']} epochs on {model_metrics['device']} · "
+                    f"{model_metrics['train_source_images']} train scenes / {model_metrics['train_tiles']:,} tiles · "
+                    f"{model_metrics['validation_source_images']} validation scenes / "
+                    f"{model_metrics['validation_tiles']:,} tiles · "
+                    + (f"{test_metrics['test_source_images']} separate test scenes / {test_metrics['test_tiles']:,} tiles."
+                       if test_metrics else "Test scenes not evaluated yet.")
+                )
+                history = pd.DataFrame(model_metrics.get("history", []))
+                if not history.empty:
+                    loss_history = history.melt(
+                        id_vars="epoch",
+                        value_vars=["train_loss", "validation_loss"],
+                        var_name="Split",
+                        value_name="Dice + focal loss",
+                    )
+                    loss_history["Split"] = loss_history["Split"].map({
+                        "train_loss": "Training",
+                        "validation_loss": "Validation",
+                    })
+                    loss_chart = alt.Chart(loss_history).mark_line(point=True).encode(
+                        x=alt.X("epoch:Q", title="Epoch", axis=alt.Axis(tickMinStep=1)),
+                        y=alt.Y("Dice + focal loss:Q", title="Dice + focal loss"),
+                        color=alt.Color("Split:N", title="Dataset split"),
+                        tooltip=["epoch:Q", "Split:N", alt.Tooltip("Dice + focal loss:Q", format=".3f")],
+                    ).properties(height=220)
+                    st.altair_chart(loss_chart, width="stretch", alt="Training and validation loss by epoch")
+                st.info(
+                    "Validation and test scenes come from SpaceNet AOI 2 Las Vegas; the test scenes were not used for training or checkpoint selection. "
+                    "These metrics measure performance within the Las Vegas dataset; they are not Lagos accuracy. "
+                    "Lagos inference requires compatible high-resolution Lagos imagery.",
+                    title="U-Net validation context",
+                )
+                if MODEL_TEST_PREVIEW.is_file():
+                    st.image(
+                        str(MODEL_TEST_PREVIEW),
+                        alt="SpaceNet test scene 291 shown as RGB imagery, reference building labels, and project U-Net predictions",
+                    )
+                    st.caption("Qualitative example from one held-out Las Vegas test scene; it is not Lagos imagery.")
+            else:
+                st.info("No project-trained U-Net metrics are saved yet. The current map above is the separate Open Buildings V3 baseline.")
+
     with explore:
         if explore.open:
             st.markdown("### Explore and export a confidence-filtered subset")
@@ -391,7 +452,7 @@ def main() -> None:
             st.markdown("### For technical users")
             st.write("The source is an Earth Engine export of Open Buildings V3, filtered by a confidence threshold and clipped to a FAO GAUL 2025 level 2 Lagos boundary. Coordinates remain in WGS 84. The table and download controls expose a filtered subset of the features already in the GeoJSON.")
             st.markdown("### Known interpretation limits")
-            st.write("This project reuses published model predictions. It does not train a model, validate detections against local reference data, or produce a complete building census. Exact boundary containment remains unverified unless the matching boundary GeoJSON is supplied and the optional exact check is run in Technical QA.")
+            st.write("The Ikeja map is the separate Google Research Open Buildings V3 baseline. Project-trained SpaceNet U-Net metrics, when present, are reported against held-out Las Vegas source images and do not establish Lagos accuracy. This project has not yet been validated against local Lagos reference labels or a field survey. Exact boundary containment remains unverified unless the matching boundary GeoJSON is supplied and the optional exact check is run in Technical QA.")
             st.markdown("### Run locally")
             st.code("python -m venv .venv\n.venv\\Scripts\\Activate.ps1\npip install -r requirements-app.txt\nstreamlit run app.py", language="powershell")
             st.caption("Downloads are saved by your browser to its configured Downloads folder. The app does not upload your files to a server.")

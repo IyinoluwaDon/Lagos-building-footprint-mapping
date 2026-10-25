@@ -9,12 +9,12 @@
 - **Current study area:** Ikeja Local Government Area (LGA), Lagos State, Nigeria
 - **Intended scope:** Selectable Lagos LGAs; the supplied and locally audited export is Ikeja
 - **Data products:** SpaceNet 2 AOI 2 Vegas building-segmentation model pipeline for Lagos transfer, plus existing Google Research Open Buildings V3 predictions clipped to a selected Lagos LGA
-- **Model status:** U-Net preparation, training, and inference code is implemented. SpaceNet data has not yet been prepared, training has not yet run, and no Lagos U-Net output is included.
+- **Model status:** A four-level U-Net has been trained on a compact real SpaceNet 2 AOI 2 Vegas subset (48 source image/label pairs, 377 chips, five CPU epochs, base width 8). Validation pixel IoU/F1 are 0.516/0.680. An independent test set of 10 additional source scenes (90 chips) scored IoU/F1 0.597/0.748 at threshold 0.5. No Lagos U-Net output is included because compatible high-resolution Lagos RGB imagery is not in the project files.
 - **Current repository folder:** `building-footprints-unet` is a legacy name and does not accurately describe the current Lagos-only workflow. The clearer proposed name is `lagos-building-footprint-mapping`. The GitHub remote still points to `IyinoluwaDon/Building-footprints-unet` until its owner renames it.
 
 ## 2. Executive summary
 
-This project now has two distinct building-mapping workflows. The model workflow prepares SpaceNet 2 AOI 2 Vegas imagery and building polygons, trains a four-level U-Net with Dice plus binary focal loss, evaluates held-out source images using IoU and F1, and applies a selected checkpoint to georeferenced high-resolution Lagos RGB imagery inside a supplied boundary. Training, validation, and inference code are implemented; SpaceNet training and Lagos inference have not yet been run. The companion Lagos baseline workflow uses Google Earth Engine (GEE) to select an LGA from FAO GAUL 2025 level 2, filter Google Research Open Buildings V3 by confidence, clip results, and export footprints, boundary, and provenance. A local Python audit checks that export, and a Streamlit application explores the supplied Ikeja baseline.
+This project has two distinct building-mapping workflows. The model workflow trains a four-level U-Net with Dice plus binary focal loss using a small sample of real SpaceNet 2 AOI 2 Vegas RGB-PanSharpen scenes and paired building GeoJSON. It uses image-level train/validation splits, selects a checkpoint by validation IoU, and reports final metrics on a separate set of unseen source images. The current test set scored pixel IoU 0.597 and F1 0.748 at threshold 0.5. The Lagos transfer-inference code is implemented, but no compatible high-resolution Lagos image is supplied, so Lagos U-Net predictions have not been produced. The separate Lagos baseline workflow uses Google Earth Engine (GEE) to select an LGA from FAO GAUL 2025 level 2, filter Google Research Open Buildings V3 by confidence, clip results, and export footprints, boundary, and provenance. A local Python audit checks that export, and a Streamlit application explores the supplied Ikeja baseline and displays U-Net training/test results separately.
 
 The current supplied export contains **53,437 predicted footprints** for Ikeja at confidence **≥ 0.75**. The metadata reports a study area of **46.0156 km²**. Structural, score, identifier, coordinate, area, and topology checks passed. The matching boundary GeoJSON was absent from the supplied local files, so independent containment against that boundary has **not been verified**. No local reference labels or field survey were supplied, so the project cannot report precision, recall, completeness, or local building-detection accuracy.
 
@@ -81,7 +81,7 @@ Build a reproducible SpaceNet U-Net training and Lagos inference workflow, while
 
 For reuse, credit Google Research Open Buildings V3 and FAO GAUL 2025 under CC BY 4.0. See the [Open Buildings V3 Earth Engine catalog page](https://developers.google.com/earth-engine/datasets/catalog/GOOGLE_Research_open-buildings_v3_polygons) and [FAO GAUL 2025 level 2 catalog page](https://developers.google.com/earth-engine/datasets/catalog/FAO_GAUL_2025_level2) for source descriptions and terms.
 
-The Earth Engine notebook requires the user's Earth Engine-enabled Google Cloud Project ID and Google account authentication in Colab. Do not put credentials, tokens, or keys in this repository. The notebook exports to the authenticated user's Google Drive; the local Streamlit application does not upload the data it reads. The SpaceNet U-Net workflow is implemented locally in `src/lagos_buildings/`; the training run and Lagos inference outputs remain to be generated.
+The Earth Engine notebook requires the user's Earth Engine-enabled Google Cloud Project ID and Google account authentication in Colab. Do not put credentials, tokens, or keys in this repository. The notebook exports to the authenticated user's Google Drive; the local Streamlit application does not upload the data it reads. SpaceNet images and labels are fetched individually from the public bucket using `scripts/download_spacenet_subset.py`; the selected data subset and prepared chips are ignored locally. The trained checkpoint and compact validation/test metrics are saved in `outputs/`.
 
 ## 7. Workflow: end to end
 
@@ -211,8 +211,8 @@ Use **Save filtered outputs into results/interactive** in the Explore view to re
 
 ### Verification recorded in the repository
 
-- Seven existing Python unit tests pass. See `results/lagos/unit_tests.log`.
-- The Streamlit app smoke check passes: default Ikeja data loaded without app exceptions, the dashboard showed 53,437 predictions, and four audience views were available. See `results/lagos/streamlit_app_smoke.log`.
+- Eleven current tests pass: seven export-QA tests, three U-Net/loss/tiling tests, and one Streamlit app smoke test that checks the baseline and saved model metrics.
+- The Streamlit app smoke test loaded the Ikeja baseline (53,437 predictions) and displayed the separate U-Net validation IoU 0.516/F1 0.680 and test IoU 0.597/F1 0.748 without app exceptions.
 - The full current export audit is in `results/lagos/QA_REPORT.md`, with machine-readable metrics in `results/lagos/qa_summary.json` and run output in `results/lagos/qa_run.log`.
 
 The smoke check uses Streamlit's in-process `AppTest`; the app server was not left running. A user can start it with `streamlit run app.py`.
@@ -254,11 +254,11 @@ Recommended next upgrades, ordered by evidence value:
 1. Export the exact Ikeja boundary from the same notebook run, store it beside the source GeoJSON/CSV, and rerun exact containment QA.
 2. Define and document an independent reference sample (source/date, sampling design, inclusion criteria, annotator protocol, and quality control).
 3. Compare predictions with that reference sample and report precision, recall, omission/commission errors, and uncertainty with clearly stated denominators.
-4. If future work requires a newly trained model, define a separate supervised-learning scope with suitable high-resolution imagery, labels, spatial train/validation/test separation, and compute budget. This would be a new phase; it is not part of current results.
+4. To complete the Lagos model-transfer result, obtain compatible high-resolution Lagos RGB imagery, run the saved checkpoint over the selected Lagos boundary, and compare the output against independent local building reference labels.
 
 ## 13. Short description for a report or slide
 
-> This project develops a resource-conscious and reproducible workflow to extract, audit, and explore Google Research Open Buildings V3 footprint predictions for Lagos LGAs. Using Google Earth Engine, the workflow applies a configurable confidence threshold and clips outputs to a FAO GAUL 2025 level 2 boundary, then exports GeoJSON and provenance metadata for local QA and presentation. The supplied Ikeja export contains 53,437 predictions at confidence ≥ 0.75. Structural and geometry checks passed, while exact local boundary containment remains unverified because the matching boundary file is not present. The output is a prediction layer rather than an independently validated census; no local precision, recall, completeness, or accuracy estimate is claimed.
+> This project combines a compact project-trained four-level U-Net with a separate Google Research Open Buildings V3 Lagos baseline. The U-Net uses 48 real SpaceNet 2 AOI 2 Vegas image/label scenes for training and model selection, then scores pixel IoU 0.597 and F1 0.748 at threshold 0.5 on 10 additional unseen source scenes. The supplied Ikeja Open Buildings V3 export contains 53,437 predictions at confidence ≥ 0.75. The Streamlit app shows those baseline predictions separately from the U-Net validation/test results. Lagos U-Net inference awaits compatible high-resolution Lagos imagery; no local Lagos accuracy claim is made.
 
 ## 14. Suggested prompt for a future chatbot
 

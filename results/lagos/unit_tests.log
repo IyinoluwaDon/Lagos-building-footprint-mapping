@@ -1,12 +1,2 @@
-test_default_cutoff_bins_partition_values (test_analysis_helpers.ConfidenceDistributionTests.test_default_cutoff_bins_partition_values) ... ok
-test_non_aligned_cutoff_starts_at_actual_threshold (test_analysis_helpers.ConfidenceDistributionTests.test_non_aligned_cutoff_starts_at_actual_threshold) ... ok
-test_one_point_cutoff_has_clear_label (test_analysis_helpers.ConfidenceDistributionTests.test_one_point_cutoff_has_clear_label) ... ok
-test_rejects_cutoff_outside_unit_interval (test_analysis_helpers.ConfidenceDistributionTests.test_rejects_cutoff_outside_unit_interval) ... ok
-test_closed_wgs84_ring_is_valid (test_analysis_helpers.GeometryRingTests.test_closed_wgs84_ring_is_valid) ... ok
-test_open_ring_is_invalid (test_analysis_helpers.GeometryRingTests.test_open_ring_is_invalid) ... ok
-test_out_of_range_coordinate_is_invalid (test_analysis_helpers.GeometryRingTests.test_out_of_range_coordinate_is_invalid) ... ok
-
-----------------------------------------------------------------------
-Ran 7 tests in 0.004s
-
-OK
+...........                                                              [100%]
+11 passed in 20.05s

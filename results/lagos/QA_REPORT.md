@@ -1,7 +1,7 @@
 # Ikeja Open Buildings export: data quality report
 
-Analysis run (UTC): 2026-10-22T15:30:15.713338+00:00
-Runtime: Python 3.12.14, Pillow 12.3.0, Shapely 2.2.0.
+Analysis run (UTC): 2026-10-25T18:37:25.288828+00:00
+Runtime: Python 3.12.14, Pillow 13.0.0, Shapely 2.2.0.
 Boundary: Ikeja LGA; 46.016 km² per the supplied summary CSV.
 Source: Google Research Open Buildings V3 (inference year 2023); confidence cutoff 0.75.
 

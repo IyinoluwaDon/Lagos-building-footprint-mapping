@@ -1,6 +1,6 @@
-Analysis UTC: 2026-10-22T15:30:15.713338+00:00
+Analysis UTC: 2026-10-25T18:37:25.288828+00:00
 Python: 3.12.14
-Pillow: 12.3.0; Shapely: 2.2.0
+Pillow: 13.0.0; Shapely: 2.2.0
 GeoJSON: Ikeja_open_buildings_conf075.geojson (21246347 bytes)
 GeoJSON SHA-256: 8832c6035c7ce73cbd7cea8733d52138e85199a6a46a96bbfd96e33070d1f8e1
 Summary CSV SHA-256: 4e7fca6c3e180a0424737e3b22cb0bac68cf422d477d5c1e8b41a89c8f359a46

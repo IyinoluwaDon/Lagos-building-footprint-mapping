@@ -1,8 +1,8 @@
 {
-  "analysis_timestamp_utc": "2026-10-22T15:30:15.713338+00:00",
+  "analysis_timestamp_utc": "2026-10-25T18:37:25.288828+00:00",
   "analysis_environment": {
     "python": "3.12.14",
-    "pillow": "12.3.0",
+    "pillow": "13.0.0",
     "shapely": "2.2.0"
   },
   "inputs": {

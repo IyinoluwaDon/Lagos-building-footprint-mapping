@@ -9,6 +9,7 @@ import geopandas as gpd
 import numpy as np
 import rasterio
 import torch
+from pyproj import CRS as PyprojCRS
 from rasterio.features import rasterize, shapes
 from shapely.geometry import shape
 from shapely.ops import unary_union
@@ -63,7 +64,7 @@ def predict_tile(
             raise ValueError("Lagos inference image must use a projected CRS with linear pixel units.")
         if src.count < 3:
             raise ValueError("Lagos inference image must have at least three RGB bands.")
-        axis_info = src.crs.axis_info
+        axis_info = PyprojCRS.from_user_input(src.crs).axis_info
         if len(axis_info) < 2 or any(axis.unit_conversion_factor is None for axis in axis_info[:2]):
             raise ValueError("Could not determine projected CRS units for the Lagos image.")
         resolution_m = [abs(src.res[index]) * axis_info[index].unit_conversion_factor for index in range(2)]

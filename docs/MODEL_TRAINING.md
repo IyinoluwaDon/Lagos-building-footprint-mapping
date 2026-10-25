@@ -1,5 +1,13 @@
 # SpaceNet U-Net Training and Lagos Transfer
 
+## Completed compact model run
+
+The project now includes a U-Net trained from real SpaceNet 2 AOI 2 Vegas RGB-PanSharpen scenes and their paired building GeoJSON labels. The seeded training/validation sample uses 48 source scenes (117.27 MiB downloaded), converted to 377 aligned 256 × 256 chips. A source-image split assigns 38 scenes to training and 10 to validation. The four-level RGB U-Net used base width 8, soft Dice plus binary focal loss, Adam at 1e-4, batch size 8, and five CPU epochs. The best checkpoint's validation pixel IoU/F1 at threshold 0.5 are 0.516/0.680.
+
+A separate sample of 12 additional scene pairs (29.33 MiB) was downloaded with all training and validation IDs excluded. Ten of these unseen scenes (90 chips) form the final test split; the other two are not used in model training or scoring. The untouched test pixel IoU is 0.597 and F1 is 0.748 at the same threshold. The checkpoint, training history, and test metrics are saved under `outputs/`. This small, reproducible subset run demonstrates that the model was trained and tested; it is not a full-dataset benchmark or a Lagos accuracy result.
+
+The training subset manifest, model/validation metrics, test metrics, and code record scene IDs and checks the final test IDs against training and checkpoint-selection IDs. Downloaded imagery and prepared chips remain local and ignored by Git.
+
 ## Training data and masks
 
 The model uses the RGB-PanSharpen images and building GeoJSON polygons from SpaceNet 2 AOI 2 Las Vegas. Each polygon collection is reprojected to its paired image CRS and rasterized using that image's affine transform. The resulting binary mask uses 1 for building pixels and 0 for background.
@@ -20,9 +28,10 @@ The SpaceNet training imagery is WorldView-3 pansharpened RGB at approximately 0
 
 ## Reproduction
 
-1. Download and extract the official SpaceNet 2 AOI 2 Vegas building training archive.
-2. Run `python -m lagos_buildings.prepare` with its `RGB-PanSharpen` and `geojson/buildings` folders.
-3. Run `python -m lagos_buildings.train` to save the selected model and validation metrics.
-4. Supply georeferenced Lagos RGB imagery and a Lagos boundary to `python -m lagos_buildings.predict`.
+1. Run `python scripts/download_spacenet_subset.py --output data/spacenet --count 48 --seed 42` to fetch a compact matched sample from the public bucket.
+2. Run `python scripts/download_spacenet_subset.py --output data/spacenet_test --count 12 --seed 43 --exclude-manifest data/spacenet/download_manifest.json` for a disjoint test sample.
+3. Run `python -m lagos_buildings.prepare` with the downloaded `RGB-PanSharpen` and `geojson/buildings` folders.
+4. Train using the training command in the README, prepare the test scenes separately, and run `python -m lagos_buildings.evaluate`.
+5. Supply compatible georeferenced Lagos RGB imagery and a Lagos boundary to `python -m lagos_buildings.predict`.
 
-Training imagery, chips, model weights, metrics, and Lagos predictions are generated locally and are excluded from Git.
+Downloaded imagery, prepared chips, and generated Lagos inference rasters/footprints are local and ignored. The compact trained checkpoint and validation/test metrics are tracked so the app can show the actual run.

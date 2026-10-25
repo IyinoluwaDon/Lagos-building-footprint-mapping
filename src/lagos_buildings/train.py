@@ -104,7 +104,7 @@ def train(
             "threshold": threshold,
         }
         history.append(row)
-        print(json.dumps(row))
+        print(json.dumps(row), flush=True)
         if val_metrics["iou"] > best_iou:
             best_iou = val_metrics["iou"]
             best_f1 = val_metrics["f1"]
@@ -129,6 +129,12 @@ def train(
         "architecture": "U-Net",
         "training_source": "SpaceNet 2 AOI 2 Vegas RGB-PanSharpen with rasterized building GeoJSON masks",
         "split": "source-image-level train/validation split",
+        "seed": seed,
+        "base_channels": base_channels,
+        "train_source_images": len(manifest["train_source_image_ids"]),
+        "validation_source_images": len(manifest["validation_source_image_ids"]),
+        "train_source_image_ids": manifest["train_source_image_ids"],
+        "validation_source_image_ids": manifest["validation_source_image_ids"],
         "loss": "soft Dice + binary focal loss",
         "optimizer": "Adam",
         "device": str(device),

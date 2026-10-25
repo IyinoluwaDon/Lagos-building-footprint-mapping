@@ -8,11 +8,22 @@ results/interactive/
 
 # Downloaded training imagery, prepared chips, Lagos source imagery, and model outputs
 data/spacenet_tiles/
+data/spacenet/
+data/spacenet_test/
+data/spacenet_test_tiles/
 data/lagos_imagery/
-outputs/
-*.pt
-*.pth
+# Keep the trained estimator and run metrics available in fresh clones.
+outputs/*
+!outputs/
+outputs/*
+!outputs/unet_spacenet2_vegas.pt
+!outputs/unet_spacenet2_vegas.metrics.json
+!outputs/unet_spacenet2_vegas.test_metrics.json
+!outputs/model_test_scene291_preview.png
 
 # Temporary presentation authoring and chart data
 .build/
 .chart-data-*/
+
+# Local editable-install metadata
+*.egg-info/
