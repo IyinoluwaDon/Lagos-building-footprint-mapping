@@ -97,7 +97,7 @@ The Colab notebook `notebooks/lagos_open_buildings_gee.ipynb` selects a Lagos LG
 Install the dashboard dependencies and launch the existing export viewer:
 
 ```powershell
-python -m pip install -r requirements-app.txt
+python -m pip install -r requirements.txt
 streamlit run app.py
 ```
 

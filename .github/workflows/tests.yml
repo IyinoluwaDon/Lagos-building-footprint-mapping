@@ -10,6 +10,6 @@ jobs:
           python-version: '3.12'
       - run: python -m pip install torch --index-url https://download.pytorch.org/whl/cpu
       - run: python -m pip install pytest numpy matplotlib pillow shapely
-      - run: python -m pip install -r requirements-app.txt
+      - run: python -m pip install -r requirements.txt
       - run: python -m pip install -e ".[model]"
       - run: python -m pytest -q
